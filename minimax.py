@@ -84,7 +84,7 @@ def min_value(actions, board, playerChar, playerWin, opponnetWin, opponnetChar, 
 
 def max_value(actions, board, playerChar, playerWin, opponnetWin, opponnetChar, inc):
     tempB = deepcopy(board)
-    total_nodes = 0
+    totNodes = 0
     Values = []
     if playerChar == 'X':
         player = 'p1'
@@ -148,7 +148,7 @@ def check_board(game):
     player1= 0
     player = 'E'
     counter = 1
-    win = None
+    winner = None
     for i in range(6):
         for j in range(6):
             if game[i][j] == 'E':
@@ -264,9 +264,9 @@ def check_board(game):
 def print_board(game):
     for x in range(6):
         for y in range(6):
-            print(game[x][y], end='')
-            print(' ', end='')
-        print('\n', end='')
+            print(game[x][y])#, end='')
+            print(' ')#, end='')
+        print('\n')#, end='')
     print('------------------')
 
 #start of main
