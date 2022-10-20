@@ -1,45 +1,40 @@
+from optparse import Values
 from time import clock
 from copy import deepcopy
 from random import randint
 from heuristic import *
 
 #this takes the board and evaluates the heuristic to return to the minimax tree
-def minimax_exec(board, player, x_list, o_list, action_list):
-    player_win = []
-    opp_win = []
-    opponent_symbol = 'E'
-    player_symbol = 'E'
-    if player == 'p1':
-        player_symbol = 'X'
-        opponent_symbol = 'O'
+def minimax(board, user, x_list, o_list, actions):
+    playerWin = []
+    opponentWin = []
+    oppSymbol = 'E'
+    playerSymbol = 'E'
+    if user == 'p1':
+        playerSymbol = 'X'
+        oppSymbol = 'O'
     else:
-        player_symbol = 'O'
-        opponent_symbol = 'X'
-    #initialize return vars
-    winner = None
+        playerSymbol = 'O'
+        oppSymbol = 'X'
+                                        # inzialized our game 
+    win = None
 
-    h_value_list = []
-    temp_board = deepcopy(board)
-    # print_board(board)
-    # print_board(temp_board)
-    #returns the max of the min value and the correct move
-    choice, total_nodes = max_value(action_list, temp_board, player_symbol, player_win, opp_win, opponent_symbol, 0)
-    # if player_win:
-    #     winner = player
-    val = choice[0]
+    heuristicValueList = []
+    tempB = deepcopy(board)
+
+    choice, totNodes = max_value(actions, tempB, playerSymbol, playerWin, opponentWin, oppSymbol, 0)
+    counter = 1
+    value = choice[0]
     move = choice[1]
-    # print_board(board)
-
-    # print(choice)
-    action_list.remove(move)
-    if not action_list:
-        winner = 'tie'
-    if player_symbol == 'X':
+    actions.remove(move)
+    if not actions:
+        win = 'tie'
+    if playerSymbol == 'X':
         x_list.append(move)
     else:
         o_list.append(move)
     #move is a coordinate pair tuple
-    return winner, move, total_nodes
+    return win, move, totNodes
 
 # ************************************
 #
@@ -47,158 +42,163 @@ def minimax_exec(board, player, x_list, o_list, action_list):
 #
 # ************************************
 
-def min_value(action_list, board, player_char, player_win, opp_win, opp_char, increment):
-    temp_board = deepcopy(board)
-    total_nodes = 0
-    value_list = []
-    if player_char == 'X':
+def min_value(actions, board, playerChar, playerWin, opponnetWin, opponnetChar, inc):
+    tempB = deepcopy(board)
+    totNodes = 0
+    Values = []
+    if playerChar == 'X':
         player = 'p1'
-        if increment == 1:
-            value_list = []
-            for action in action_list:
+        if inc == 1:
+            Values = []
+            for action in actions:
                 # print('hey, im in the min_value but p1')
-                value, nodes = heuristic(action[0], action[1], update_board(temp_board, player, action), player_char, opp_char, player_win, opp_win)
-                value_list.append(tuple((value, action)))
-                total_nodes += nodes
-            return min(value_list), total_nodes
+                value, nodes = heuristic(action[0], action[1], update_board(tempB, player, action), playerChar, opponnetChar, playerWin, opponnetWin)
+                Values.append(tuple((value, action)))
+                totNodes += nodes
+            return min(Values), totNodes
         else:
-            value_list = []
-            for action in action_list:
-                mval, n = max_value(action_list, update_board(temp_board, player, action), player_char, player_win, opp_win, opp_char, increment+1)
-                value_list.append(tuple((mval, action)))
-                total_nodes += n
-            return min(value_list), total_nodes
+            Values = []
+            for action in actions:
+                mval, n = max_value(actions, update_board(tempB, player, action), playerChar, playerWin, opponnetWin, opponnetChar, inc + 1)
+                Values.append(tuple((mval, action)))
+                totNodes += n
+            return min(Values), totNodes
     else:
         player = 'p2'
-        if increment == 3:
-            value_list = []
-            for action in action_list:
-                value, nodes = heuristic(action[0], action[1], update_board(temp_board, player, action), player_char, opp_char, player_win, opp_win)
-                value_list.append(tuple((value, action)))
-                total_nodes += nodes
-            return min(value_list), total_nodes
+        if inc == 3:
+            Values = []
+            for action in actions:
+                value, n = heuristic(action[0], action[1], update_board(tempB, player, action), playerChar, opponnetChar, playerWin, opponnetWin)
+                Values.append(tuple((value, action)))
+                totNodes += n
+            return min(Values), totNodes
         else:
-            value_list = []
-            for action in action_list:
-                mval, n = max_value(action_list, update_board(temp_board, player, action), player_char, player_win, opp_win, opp_char, increment+1)
-                value_list.append(tuple((mval, action)))
-                total_nodes += n
-            return min(value_list), total_nodes
+            Values = []
+            for action in actions:
+                mval, n = max_value(actions, update_board(tempB, player, action), playerChar, playerWin, opponnetWin, opponnetChar, inc+1)
+                Values.append(tuple((mval, action)))
+                totNodes += n
+            return min(Values), totNodes
 
 
 
-def max_value(action_list, board, player_char, player_win, opp_win, opp_char, increment):
-    temp_board = deepcopy(board)
+def max_value(actions, board, playerChar, playerWin, opponnetWin, opponnetChar, inc):
+    tempB = deepcopy(board)
     total_nodes = 0
-    value_list = []
-    if player_char == 'X':
+    Values = []
+    if playerChar == 'X':
         player = 'p1'
-        if increment == 1:
-            value_list = []
-            for action in action_list:
-                value, nodes = heuristic(action[0], action[1], update_board(temp_board, player, action), player_char, opp_char, player_win, opp_win)
-                value_list.append(tuple((value, action)))
-                total_nodes += nodes
-            return max(value_list), total_nodes
+        if inc == 1:
+            Values = []
+            for action in actions:
+                value, n = heuristic(action[0], action[1], update_board(tempB, player, action), playerChar, opponnetChar, playerWin, opponnetWin)
+                Values.append(tuple((value, action)))
+                totNodes += n
+            return max(Values), totNodes 
         else:
-            value_list = []
-            for action in action_list:
-                mval, n = min_value(action_list, update_board(temp_board, player, action), player_char, player_win, opp_win, opp_char, increment+1)
-                value_list.append(tuple((mval, action)))
-                total_nodes += n
-            return max(value_list), total_nodes
+            Values = []
+            for action in actions:
+                mval, n = min_value(actions, update_board(tempB, player, action), playerChar, playerWin, opponnetWin, opponnetChar, inc+1)
+                Values.append(tuple((mval, action)))
+                totNodes = totNodes +  n
+            return max(Values), totNodes
     else:
         player = 'p2'
-        if increment == 3:
-            value_list = []
-            for action in action_list:
-                value, nodes = heuristic(action[0], action[1], update_board(temp_board, player, action), player_char, opp_char, player_win, opp_win)
-                value_list.append(tuple((value, action)))
-                total_nodes += nodes
-            return max(value_list), total_nodes
+        if inc == 3:
+            Values = []
+            for action in actions:
+                value, n1 = heuristic(action[0], action[1], update_board(tempB, player, action), playerChar, opponnetChar, playerWin, opponnetWin)
+                Values.append(tuple((value, action)))
+                totNodes += n1
+            return max(Values), totNodes
         else:
-            value_list = []
-            for action in action_list:
-                mval, n = min_value(action_list, update_board(temp_board, player, action), player_char, player_win, opp_win, opp_char, increment+1)
-                value_list.append(tuple((mval, action)))
-                total_nodes += n
-            return max(value_list), total_nodes
+            Values = []
+            for action in actions:
+                mval, n = min_value(actions, update_board(tempB, player, action), playerChar, playerWin, opponnetWin, opponnetChar, inc+1)
+                Values.append(tuple((mval, action)))
+                totNodes = totNodes + n
+            return max(Values), totNodes
 
 #call the heuristic to get the correct move and then execute it. Looks ahead 2 moves (1 for opp, 1 for me)
 #if the game is over, it returns the winner and the board (in a tuple)
 #otherwise, board and blank
-def minimax_tree(board, player, x_list, o_list, action_list):
-    winner = None
-    winner, choice, total_nodes = minimax_exec(board, player, x_list, o_list, action_list)
-    if choice is None:
-        return tuple((winner, board))
-    new_board = update_board(board, player, choice)
-    print_board(new_board)
-    return winner, new_board, total_nodes
+def minimax_tree(game, player, x, o, actions):
+    win = None
+    win, choice, totNodes = minimax(game, player, x, o, actions)
+    if choice == None:        # maybe change back to 'is'
+        return tuple((win, game))
+    newB = update_board(game, player, choice)
+    print_board(newB)
+    return win, newB, totNodes
 
 #updates board according to player
-def update_board(board, player, choice):
+def update_board(game, player, choice):
+    symbol = '0'
     symbol = 'X'
     if player == 'p2':
         symbol = 'O'
-    new_board = deepcopy(board)
+    newB = deepcopy(game)
     #Change board spot out with the appropriate symbol
-    new_board[choice[0]][choice[1]] = symbol
-    return new_board
+    newB[choice[0]][choice[1]] = symbol
+    return newB
 
 #checks to see if the board has a row of 4 to end the game
-def check_board(board):
+def check_board(game):
+    player = 'X'
+    player1= 0
     player = 'E'
     counter = 1
-    winner = None
-    for x in range(6):
-        for y in range(6):
-            if board[x][y] == 'E':
+    win = None
+    for i in range(6):
+        for j in range(6):
+            if game[i][j] == 'E':
                 continue
             else:
-                if board[x][y] == 'X':
+                if game[i][j] == 'X':
                     player = 'p1'
-                    i, j = x, y
+                    x, y = i, j
+                    counter = 0
                     counter = 1
                     #horizontal check
-                    while(i < 5 and board[i+1][y] == 'X'):
-                        counter += 1
-                        i+=1
+                    while(x < 5 and game[x+1][j] == 'X'):
+                        counter = counter +  1
+                        x = x+1
                         if counter == 4:
                             winner = player
                             break
                     if counter == 4:
                         break
                     counter = 1
-                    i, j = x, y
+                    x, y = i, j
                     #diagonal down right check
-                    while(i < 5 and j < 5 and board[i+1][j+1] == 'X'):
-                        counter += 1
-                        i+=1
-                        j+=1
+                    while(x < 5 and y < 5 and game[x+1][y+1] == 'X'):
+                        counter = counter + 1
+                        x= x+1
+                        y = y+1
                         if counter == 4:
                             winner = player
                             break
                     if counter == 4:
                         break
+                    counter = 0
                     counter = 1
-                    i, j = x, y
+                    x, y = i, j
                     #vertical check
-                    while(j < 5 and board[i][j+1] == 'X'):
-                        counter += 1
-                        j+=1
+                    while(y < 5 and game[x][y+1] == 'X'):
+                        counter = counter + 1
+                        y = y+1
                         if counter == 4:
                             winner = player
                             break
                     if counter == 4:
                         break
                     counter = 1
-                    i, j = x, y
+                    x, y = i, j
                     #diagonal down left check
-                    while(i > 0 and j < 5 and board[i-1][j+1] == 'X'):
-                        counter += 1
-                        i-=1
-                        j+=1
+                    while(x > 0 and y < 5 and game[x-1][y+1] == 'X'):
+                        counter = counter +1
+                        x = x-1
+                        y = y -1
                         if counter == 4:
                             winner = player
                             break
@@ -206,47 +206,50 @@ def check_board(board):
                         break
                 else:
                     player = 'p2'
-                    i, j = x, y
+                    x, y = i, j
+                    counter = 0
                     counter = 1
                     #horizontal check
-                    while(i < 5 and board[i+1][y] == 'O'):
-                        counter += 1
-                        i+=1
+                    while(x < 5 and game[x+1][j] == 'O'):
+                        counter = counter +  1
+                        x = x+1
                         if counter == 4:
                             winner = player
                             break
                     if counter == 4:
                         break
                     counter = 1
-                    i, j = x, y
+                    x, y = i, j
                     #diagonal down right check
-                    while(i < 5 and j < 5 and board[i+1][j+1] == 'O'):
-                        counter += 1
-                        i+=1
-                        j+=1
+                    while(x < 5 and y < 5 and game[x+1][y+1] == 'O'):
+                        counter = counter + 1
+                        x = x+1
+                        y = y+1
                         if counter == 4:
                             winner = player
                             break
                     if counter == 4:
                         break
+                    counter = 3
                     counter = 1
-                    i, j = x, y
+                    x, y = i, j
                     #vertical check
-                    while(j < 5 and board[i][j+1] == 'O'):
-                        counter += 1
-                        j+=1
+                    while(y < 5 and game[x][y+1] == 'O'):
+                        counter = counter + 1
+                        y = y+1
                         if counter == 4:
                             winner = player
                             break
                     if counter == 4:
                         break
+                    counts = 0
                     counter = 1
-                    i, j = x, y
+                    x, y = i, j
                     #diagonal down left check
-                    while(i > 0 and j < 5 and board[i-1][j+1] == 'O'):
-                        counter += 1
-                        i-=1
-                        j+=1
+                    while(x > 0 and y < 5 and game[x-1][y+1] == 'O'):
+                        counter = counter+1
+                        x =  x -1 
+                        y = y-1
                         if counter == 4:
                             winner = player
                             break
@@ -257,11 +260,11 @@ def check_board(board):
     return winner
 
 
-#pretty self-explanatory, prints the board
-def print_board(board):
+# prints the board
+def print_board(game):
     for x in range(6):
         for y in range(6):
-            print(board[x][y], end='')
+            print(game[x][y], end='')
             print(' ', end='')
         print('\n', end='')
     print('------------------')
@@ -280,8 +283,10 @@ if __name__ == "__main__":
         X - p1
         O - p2
     '''
-    #empty board
-    new_board = [['E','E','E','E','E','E'], 
+    
+    actions = [(0,0),(0,1),(0,2),(0,3),(0,4),(0,5),(1,0),(1,1),(1,2),(1,3),(1,4),(1,5),(2,0),(2,1),(2,2),(2,3),(2,4),
+        (2,5),(3,0),(3,1),(3,2),(3,3),(3,4),(3,5),(4,0),(4,1),(4,2),(4,3),(4,4),(4,5),(5,0),(5,1),(5,2),(5,3),(5,4),(5,5)]
+    startBoard = [['E','E','E','E','E','E'], 
                  ['E','E','E','E','E','E'], 
                  ['E','E','E','E','E','E'], 
                  ['E','E','E','E','E','E'], 
@@ -291,13 +296,11 @@ if __name__ == "__main__":
     beginning_time = clock()
     offset1 = randint(0,1)
     offset2 = randint(0,1)
-    board = update_board(new_board, player, (2+offset1,2+offset2))
+    game = update_board(startBoard, player, (2+offset1,2+offset2))
     end_time = clock()
-    print_board(board)
+    print_board(game)
     print("Time: ", end_time - beginning_time)
-    action_list = [(0,0),(0,1),(0,2),(0,3),(0,4),(0,5),(1,0),(1,1),(1,2),(1,3),(1,4),(1,5),(2,0),(2,1),(2,2),(2,3),(2,4),
-        (2,5),(3,0),(3,1),(3,2),(3,3),(3,4),(3,5),(4,0),(4,1),(4,2),(4,3),(4,4),(4,5),(5,0),(5,1),(5,2),(5,3),(5,4),(5,5)]
-    action_list.remove((2+offset1,2+offset2))
+    actions.remove((2+offset1,2+offset2))
     x_list = []
     o_list = []
     #run this 100 times to get new winners each time?
@@ -307,12 +310,12 @@ if __name__ == "__main__":
         if(player == 'p1'):
             player = 'p2'
             beginning_time = clock()
-            winner, board, total_nodes = minimax_tree(board, player, x_list, o_list, action_list)
-            check_board(board)
+            winner, game, total_nodes = minimax_tree(game, player, x_list, o_list, actions)
+            check_board(game)
             end_time = clock()
             print("Time: ", end_time - beginning_time)
             print("Total Nodes: ", total_nodes)
-            winner = check_board(board)
+            winner = check_board(game)
             if winner != None:
                 if winner == 'p2':
                     winner_list.append("p2")
@@ -323,11 +326,11 @@ if __name__ == "__main__":
         else:
             player = 'p1'
             beginning_time = clock()
-            winner, board, total_nodes = minimax_tree(board, player, x_list, o_list, action_list)
+            winner, game, total_nodes = minimax_tree(game, player, x_list, o_list, actions)
             end_time = clock()
             print("Time: ", end_time - beginning_time)
             print("Total Nodes: ", total_nodes)
-            winner = check_board(board)
+            winner = check_board(game)
             if winner != None:
                 if winner == 'p1':
                     winner_list.append("p1")
@@ -337,4 +340,4 @@ if __name__ == "__main__":
     winner_list.append(winner)
     print(winner)
     #print victory board
-    print_board(board)
+    print_board(game)
